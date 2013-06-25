@@ -15,6 +15,7 @@ REQUIRED_USE="keybinder? ( gtk )
 DEPEND=""
 RDEPEND="dev-lang/python
 	dev-python/keyring
+	dev-python/gnome-keyring-python
 	gtk? ( =dev-python/pygtk-2* )
 	keybinder? ( dev-libs/keybinder[python] )
 	libnotify? ( dev-python/notify-python )"
