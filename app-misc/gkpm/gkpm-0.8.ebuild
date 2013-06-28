@@ -13,7 +13,7 @@ REQUIRED_USE="keybinder? ( gtk )
 	libnotify? ( gtk )"
 
 DEPEND=""
-RDEPEND="dev-lang/python
+RDEPEND="=dev-lang/python-2*
 	dev-python/keyring
 	dev-python/gnome-keyring-python
 	gtk? ( =dev-python/pygtk-2* )
@@ -25,8 +25,11 @@ RESTRICT="strip binchecks"
 S="${WORKDIR}/${PN}"
 
 src_install() {
-	dodoc README
+	dodir /usr/lib/"${PN}"
+	insinto /usr/lib/"${PN}"
+	doins gkpm.py
 
-	into /usr
-	newbin gkpm.py gkpm
+	dobin "${FILESDIR}"/gkpm
+
+	dodoc README
 }
