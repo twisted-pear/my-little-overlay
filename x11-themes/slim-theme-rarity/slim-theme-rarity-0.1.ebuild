@@ -2,8 +2,7 @@ EAPI=4
 
 DESCRIPTION="A Rarity theme for SLiM"
 HOMEPAGE="https://github.com/tablet-mode/slim-theme-rarity"
-# TODO: Make tablet-mode create a tag.
-SRC_URI="https://github.com/tablet-mode/slim-theme-rarity/tarball/013e3b9e33f8a848c345cca1983a4a12839e8619 -> ${P}.tar.gz"
+SRC_URI="https://github.com/tablet-mode/slim-theme-rarity/tarball/0.1 -> ${P}.tar.gz"
 
 SLOT="0"
 KEYWORDS="amd64 arm ppc ppc64 sparc x86 ~x86-fbsd"
