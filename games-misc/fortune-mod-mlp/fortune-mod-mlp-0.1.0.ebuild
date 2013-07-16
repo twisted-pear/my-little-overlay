@@ -1,6 +1,6 @@
 EAPI=5
 
-DESCRIPTION="Fortune Cookies from My Little Pony: Friendship is Magic"
+DESCRIPTION="Fortune cookies from My Little Pony: Friendship is Magic"
 HOMEPAGE="https://github.com/twisted-pear/fortune-mod-mlp"
 SRC_URI="https://github.com/twisted-pear/fortune-mod-mlp/tarball/0.1.0 -> ${P}.tar.gz"
 
