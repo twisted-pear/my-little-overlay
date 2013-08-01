@@ -1,0 +1,30 @@
+diff -urdN pidgin-gnome-keyring-1.20.org/Makefile pidgin-gnome-keyring-1.20/Makefile
+--- pidgin-gnome-keyring-1.20.org/Makefile	2011-09-01 04:15:05.000000000 +0200
++++ pidgin-gnome-keyring-1.20/Makefile	2013-08-01 13:32:37.573538024 +0200
+@@ -3,6 +3,14 @@
+ KEYRINGFLAGS = `pkg-config --libs --cflags gnome-keyring-1`
+ PURPLEFLAGS = `pkg-config --cflags purple`
+ 
++MACHINE := $(shell uname -m)
++
++ifeq ($(MACHINE), x86_64)
++libdir = /usr/lib64
++endif
++ifeq ($(MACHINE), i686)
++libdir = /usr/lib
++endif
+ 
+ all: ${TARGET}.so
+ 
+@@ -11,8 +19,8 @@
+ 	rm -rf pidgin-${TARGET}-*
+ 
+ ${TARGET}.so: ${TARGET}.c
+-	${CC} -Wall -I. -g -O2 ${TARGET}.c -o ${TARGET}.so -shared -fPIC -DPIC -ggdb ${PURPLEFLAGS} ${KEYRINGFLAGS}
++	${CC} -Wall -I. ${CFLAGS} ${TARGET}.c -o ${TARGET}.so -shared -fPIC -DPIC ${PURPLEFLAGS} ${KEYRINGFLAGS}
+ 
+ install: ${TARGET}.so
+-	mkdir -p ~/.purple/plugins
+-	cp ${TARGET}.so ~/.purple/plugins/
++	mkdir -p ${DESTDIR}${libdir}/pidgin
++	cp ${TARGET}.so ${DESTDIR}${libdir}/pidgin
