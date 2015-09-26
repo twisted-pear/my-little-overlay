@@ -1,0 +1,33 @@
+#!/sbin/runscript
+
+extra_commands="checkconfig"
+PIDFILE=/var/run/twod.pid
+CONFFILE=/etc/twodrc
+
+depend() {
+    need net
+}
+
+checkconfig() {
+    if ! [ -f ${CONFFILE} ]; then
+        eerror "You need to setup ${CONFFILE} to run twod"
+        eerror "An example can be found in /usr/share/doc/twod-<version>/examples"
+        return 1
+    fi
+
+    return 0
+}
+
+start() {
+    checkconfig || return 1
+
+    ebegin "Starting twod"
+    start-stop-daemon --start --user twod --group twod --exec /usr/bin/twod --pidfile "${PIDFILE}" --make-pidfile --background -- -D -c "${CONFFILE}"
+    eend $? "Failed to start twod"
+}
+
+stop() {
+    ebegin "Stopping twod"
+    start-stop-daemon --stop --user twod --group twod --pidfile "${PIDFILE}" --exec /usr/bin/twod
+    eend $? "Failed to stop twod"
+}
