@@ -9,6 +9,8 @@ SLOT="0"
 LICENSE="BSD-2"
 IUSE=""
 
-RDEPEND="sys-apps/pcsc-lite"
+RDEPEND="app-crypt/ccid
+	dev-libs/openssl
+	sys-apps/pcsc-lite"
 DEPEND="${RDEPEND}
 	virtual/pkgconfig"
