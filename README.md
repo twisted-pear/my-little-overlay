@@ -16,6 +16,6 @@ Just dump this into /etc/layman/overlays/my-little-overlay.xml and you are set:
           <email>twisted_pear@twstd.neomailbox.ch</email>
           <name><![CDATA[twisted_pear]]></name>
         </owner>
-        <source type="git">git://github.com/twisted-pear/my-little-overlay.git</source>
+        <source type="git">https://github.com/twisted-pear/my-little-overlay.git</source>
       </repo>
     </repositories>
