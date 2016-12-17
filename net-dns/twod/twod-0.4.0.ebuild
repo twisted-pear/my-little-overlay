@@ -12,7 +12,7 @@ DESCRIPTION="Updater daemon for TwoDNS"
 HOMEPAGE="https://github.com/tablet-mode/twod"
 SRC_URI="https://github.com/tablet-mode/twod/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
-LICENSE="GPLv3"
+LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE=""
