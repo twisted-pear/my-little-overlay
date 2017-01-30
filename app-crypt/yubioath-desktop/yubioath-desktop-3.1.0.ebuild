@@ -15,7 +15,8 @@ IUSE="X"
 
 inherit distutils-r1
 
-RDEPEND="dev-python/pycrypto
+RDEPEND="app-crypt/ccid
+	 dev-python/pycrypto
 	 dev-python/pyscard
 	 dev-python/pbkdf2
 	 dev-python/pyusb
