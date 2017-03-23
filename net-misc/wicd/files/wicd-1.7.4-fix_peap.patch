@@ -1,0 +1,48 @@
+diff -urdN wicd-1.7.4.org/encryption/templates/wpa2-peap wicd-1.7.4/encryption/templates/wpa2-peap
+--- wicd-1.7.4.org/encryption/templates/wpa2-peap	2017-01-31 18:32:57.780194738 +0100
++++ wicd-1.7.4/encryption/templates/wpa2-peap	2017-01-31 19:29:13.284305855 +0100
+@@ -1,7 +1,8 @@
+ name = WPA2-PEAP with CCMP/MSCHAPV2
+ author = atiketemola
+ version = 1
+-require identity *Username domain *Domain password *Password
++require identity *Username password *Password
++optional ca_cert *Path_to_CA_Cert
+ protected password *Password
+ -----
+ ctrl_interface=/var/run/wpa_supplicant
+@@ -11,7 +12,8 @@
+     key_mgmt=WPA-EAP
+     pairwise=CCMP
+     eap=PEAP
+-    identity="$_DOMAIN\$_IDENTITY"
++    identity="$_IDENTITY"
+     password="$_PASSWORD"
+-    phase2="auth=MSCHAPv2"
++    phase2="auth=MSCHAPV2"
++    ca_cert="$_CA_CERT"
+ }
+diff -urdN wicd-1.7.4.org/encryption/templates/wpa-peap wicd-1.7.4/encryption/templates/wpa-peap
+--- wicd-1.7.4.org/encryption/templates/wpa-peap	2017-01-31 18:32:57.780194738 +0100
++++ wicd-1.7.4/encryption/templates/wpa-peap	2017-01-31 19:28:58.428305366 +0100
+@@ -1,7 +1,8 @@
+ name = WPA1-PEAP with CCMP/MSCHAPV2
+ author = atiketemola
+ version = 1
+-require identity *Username domain *Domain password *Password
++require identity *Username password *Password
++optional ca_cert *Path_to_CA_Cert
+ protected password *Password
+ -----
+ ctrl_interface=/var/run/wpa_supplicant
+@@ -11,7 +12,8 @@
+     key_mgmt=WPA-EAP
+     pairwise=CCMP
+     eap=PEAP
+-    identity="$_DOMAIN\$_IDENTITY"
++    identity="$_IDENTITY"
+     password="$_PASSWORD"
+-    phase2="auth=MSCHAPv2"
++    phase2="auth=MSCHAPV2"
++    ca_cert="$_CA_CERT"
+ }

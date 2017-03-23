@@ -1,0 +1,158 @@
+diff -urdN wicd-1.7.3.org/encryption/templates/wired_8021x wicd-1.7.3/encryption/templates/wired_8021x
+--- wicd-1.7.3.org/encryption/templates/wired_8021x	2015-10-14 21:30:08.223218948 +0200
++++ wicd-1.7.3/encryption/templates/wired_8021x	2015-10-14 21:35:05.920406180 +0200
+@@ -2,6 +2,7 @@
+ author = Joe MacMahon
+ version = 1
+ require identity *Identity password *Password
++optional ca_cert *Path_to_CA_Cert
+ protected password *Password
+ -----
+ ctrl_interface=/var/run/wpa_supplicant
+@@ -14,4 +15,5 @@
+        phase2="auth=MSCHAPV2"
+        identity="$_IDENTITY"
+        password="$_PASSWORD"
++       ca_cert="$_CA_CERT"
+ }
+diff -urdN wicd-1.7.3.org/wicd/networking.py wicd-1.7.3/wicd/networking.py
+--- wicd-1.7.3.org/wicd/networking.py	2015-10-14 21:30:08.219218830 +0200
++++ wicd-1.7.3/wicd/networking.py	2015-10-14 21:34:08.546790396 +0200
+@@ -1227,6 +1227,14 @@
+         if self.network.get('encryption_enabled'):
+             liface.Authenticate(self.network)
+         
++        # Validate Authentication.
++        if self.network.get('enctype'):
++            self.SetStatus('validating_authentication')
++            if not liface.ValidateAuthentication(time.time()):
++                print "connect result is %s" % self.connect_result
++                if not self.connect_result or self.connect_result == 'failed':
++                    self.abort_connection('bad_pass')
++
+         # Set gateway, IP adresses, and DNS servers.
+         self.set_broadcast_address(liface)
+         self.set_ip_address(liface)
+diff -urdN wicd-1.7.3.org/wicd/wnettools.py wicd-1.7.3/wicd/wnettools.py
+--- wicd-1.7.3.org/wicd/wnettools.py	2015-10-14 21:30:08.219218830 +0200
++++ wicd-1.7.3/wicd/wnettools.py	2015-10-14 21:34:02.286711441 +0200
+@@ -884,6 +884,59 @@
+                 return True   
+         return False
+ 
++    def ValidateAuthentication(self, auth_time):
++        """ Validate WPA authentication.
++
++            Validate that the wpa_supplicant authentication
++            process was successful.
++
++            NOTE: It's possible this could return False,
++            though in reality wpa_supplicant just isn't
++            finished yet.
++            
++            Keyword arguments:
++            auth_time -- The time at which authentication began.
++            
++            Returns:
++            True if wpa_supplicant authenticated succesfully,
++            False otherwise.
++
++        """
++        # Right now there's no way to do this for these drivers
++        if ((hasattr(self, 'wpa_driver') and self.wpa_driver == RALINK_DRIVER)
++                or not self.wpa_cli_cmd):
++            return True
++
++        MAX_TIME = 35
++        MAX_DISCONNECTED_TIME = 3
++        disconnected_time = 0
++        forced_rescan = False
++        while (time.time() - auth_time) < MAX_TIME:
++            cmd = '%s -i %s status' % (self.wpa_cli_cmd, self.iface)
++            output = misc.Run(cmd)
++            result = misc.RunRegex(auth_pattern, output)
++            if self.verbose:
++                print 'WPA_CLI RESULT IS', result
++
++            if not result:
++                return False
++            if result == "COMPLETED":
++                return True
++            elif result == "DISCONNECTED" and not forced_rescan:
++                disconnected_time += 1
++                if disconnected_time > MAX_DISCONNECTED_TIME:
++                    disconnected_time = 0
++                    # Force a rescan to get wpa_supplicant moving again.
++                    forced_rescan = True
++                    self._ForceSupplicantScan()
++                    MAX_TIME += 5
++            else:
++                disconnected_time = 0
++            time.sleep(1)
++
++        print 'wpa_supplicant authentication may have failed.'
++        return False
++
+ 
+ class BaseWiredInterface(BaseInterface):
+     """ Control a wired network interface. """
+@@ -1472,59 +1525,6 @@
+ 
+         return ap
+ 
+-    def ValidateAuthentication(self, auth_time):
+-        """ Validate WPA authentication.
+-
+-            Validate that the wpa_supplicant authentication
+-            process was successful.
+-
+-            NOTE: It's possible this could return False,
+-            though in reality wpa_supplicant just isn't
+-            finished yet.
+-            
+-            Keyword arguments:
+-            auth_time -- The time at which authentication began.
+-            
+-            Returns:
+-            True if wpa_supplicant authenticated succesfully,
+-            False otherwise.
+-
+-        """
+-        # Right now there's no way to do this for these drivers
+-        if self.wpa_driver == RALINK_DRIVER or not self.wpa_cli_cmd:
+-            return True
+-
+-        MAX_TIME = 35
+-        MAX_DISCONNECTED_TIME = 3
+-        disconnected_time = 0
+-        forced_rescan = False
+-        while (time.time() - auth_time) < MAX_TIME:
+-            cmd = '%s -i %s status' % (self.wpa_cli_cmd, self.iface)
+-            output = misc.Run(cmd)
+-            result = misc.RunRegex(auth_pattern, output)
+-            if self.verbose:
+-                print 'WPA_CLI RESULT IS', result
+-
+-            if not result:
+-                return False
+-            if result == "COMPLETED":
+-                return True
+-            elif result == "DISCONNECTED" and not forced_rescan:
+-                disconnected_time += 1
+-                if disconnected_time > MAX_DISCONNECTED_TIME:
+-                    disconnected_time = 0
+-                    # Force a rescan to get wpa_supplicant moving again.
+-                    forced_rescan = True
+-                    self._ForceSupplicantScan()
+-                    MAX_TIME += 5
+-            else:
+-                disconnected_time = 0
+-            time.sleep(1)
+-
+-        print 'wpa_supplicant authentication may have failed.'
+-        return False
+-        
+-
+     def _ForceSupplicantScan(self):
+         """ Force wpa_supplicant to rescan available networks.
+     
