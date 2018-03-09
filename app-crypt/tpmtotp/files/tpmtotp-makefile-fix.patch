@@ -1,0 +1,61 @@
+diff --git a/Makefile b/Makefile
+index 54845d7..794cf1d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,25 +1,24 @@
+-CFLAGS = -ggdb -w -Ilibtpm -std=c99 -Wall -Wextra -Werror -DTPM_POSIX=1 -DTPM_NV_DISK=1 -DTPM_AES=1 -DTPM_V12=1 -DTPM_USE_TAG_IN_STRUCTURE=1 -DTPM_USE_CHARDEV=1
+-
++CFLAGS += -Ilibtpm -DTPM_POSIX=1 -DTPM_NV_DISK=1 -DTPM_AES=1 -DTPM_V12=1 -DTPM_USE_TAG_IN_STRUCTURE=1 -DTPM_USE_CHARDEV=1
+ 
+ PLYMOUTH_CFLAGS = `pkg-config --cflags ply-boot-client`
+ 
+-LDLIBS=-Llibtpm -ltpm -lcrypto -loath
++LDLIBS=-Llibtpm -ltpm -lcrypto -loath -ldl -lz
+ 
+ PLYMOUTH_LDLIBS = `pkg-config --libs ply-boot-client`
+ 
+-APPS=sealtotp unsealtotp plymouth-unsealtotp
++APPS=sealtotp unsealtotp
+ 
+ all: libtpm/libtpm.a $(APPS)
+ 
+ libtpm/libtpm.a:
+ 	$(MAKE) -C libtpm
+ 
+-unsealtotp: unsealtotp.o
++unsealtotp: unsealtotp.o libtpm/libtpm.a
+ 
+-plymouth-unsealtotp: plymouth-unsealtotp.c
++plymouth-unsealtotp: plymouth-unsealtotp.c libtpm/libtpm.a
+ 	$(CC) $(CFLAGS) $(PLYMOUTH_CFLAGS) -o $@ $< $(PLYMOUTH_LDLIBS) $(LDLIBS)
+ 
+-sealtotp: sealtotp.c base32.c
++sealtotp: sealtotp.c base32.c libtpm/libtpm.a
+ 	$(CC) $(CFLAGS) -ltspi -lqrencode -o $@ $^ $(LDLIBS)
+ 
+ clean:
+@@ -27,12 +26,7 @@ clean:
+ 	$(MAKE) -C libtpm clean
+ 
+ install:
+-	install sealtotp unsealtotp plymouth-unsealtotp /usr/bin/
+-	install -D dracut/module-setup.sh /usr/lib/dracut/modules.d/60tpmtotp/module-setup.sh
+-	install -m 0644 tpmtotp.service /lib/systemd/system
+-	systemctl enable tpmtotp.service
++	install $(APPS) $(DESTDIR)usr/bin/
+ 
+ uninstall:
+-	rm /usr/bin/sealtotp /usr/bin/unsealtotp /usr/bin/plymouth-unsealtotp
+-	rm -rf /usr/lib/dracut/modules.d/60tpmtotp/
+-	rm /lib/systemd/system/tpmtotp.service
++	cd $(DESTDIR)usr/bin ; rm $(APPS)
+diff --git a/libtpm/Makefile b/libtpm/Makefile
+index eee8896..9e5a454 100644
+--- a/libtpm/Makefile
++++ b/libtpm/Makefile
+@@ -1,4 +1,4 @@
+-CFLAGS = -ggdb -Wall -w -I. -DTPM_POSIX=1 -DTPM_NV_DISK=1 -DTPM_AES=1 -DTPM_V12=1 -DTPM_USE_TAG_IN_STRUCTURE=1 -DTPM_USE_CHARDEV=1
++CFLAGS += -I. -DTPM_POSIX=1 -DTPM_NV_DISK=1 -DTPM_AES=1 -DTPM_V12=1 -DTPM_USE_TAG_IN_STRUCTURE=1 -DTPM_USE_CHARDEV=1
+ 
+ LIBRARIES = libtpm.a
+ HEADERS = tpmfunc.h tpm.h tpmkeys.h
