@@ -21,21 +21,21 @@ DEPEND="sys-cluster/libqb
 		sys-libs/libcap-ng
 		>=dev-cpp/catch-1.5.6
 		dev-libs/protobuf
-		=dev-libs/pegtl-1.3.1*
+		dev-libs/pegtl
 		dbus? ( sys-apps/dbus
 						dev-libs/dbus-glib )
 		qt4? ( dev-qt/qtgui:4
-					 dev-qt/qtsvg:4
-					 dev-qt/qtcore:4 )
+						dev-qt/qtsvg:4
+						dev-qt/qtcore:4 )
 		qt5? ( dev-qt/qtgui:5
-					 dev-qt/qtsvg:5
-					 dev-qt/qtwidgets:5
-					 dev-qt/qtcore:5 )
+						dev-qt/qtsvg:5
+						dev-qt/qtwidgets:5
+						dev-qt/qtcore:5 )
 		crypt? (
 			crypt_gcrypt? ( dev-libs/libgcrypt )
 			crypt_sodium? ( dev-libs/libsodium )
 		)
-		dev-ruby/asciidoctor
+		app-text/asciidoc
 		"
 
 RDEPEND="${DEPEND}
@@ -52,6 +52,9 @@ REQUIRED_USE="
 
 src_prepare() {
 	default
+	# fix includes for Gentoo's catch
+	sed -i 's#CPPFLAGS="-std=c++11 \$CPPFLAGS -I/usr/include/catch"$#CPPFLAGS="-std=c++11 $CPPFLAGS -I/usr/include/catch -I/usr/include/catch2"#' configure.ac
+	sed -i 's#catch_CFLAGS="-I/usr/include/catch"$#catch_CFLAGS="-I/usr/include/catch -I/usr/include/catch2"#' configure.ac
 	eautoreconf
 }
 
