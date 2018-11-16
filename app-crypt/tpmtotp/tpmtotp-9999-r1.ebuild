@@ -10,14 +10,15 @@ HOMEPAGE="https://github.com/mjg59/tpmtotp/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="static"
+IUSE="static libressl"
 KEYWORDS="~amd64"
 
 PATCHES=( "${FILESDIR}"/tpmtotp-makefile-fix.patch )
 
 DEPEND="
 	app-crypt/trousers
-	dev-libs/openssl
+	libressl? ( dev-libs/libressl )
+	!libressl? ( dev-libs/openssl )
 	media-gfx/qrencode
 	sys-auth/oath-toolkit
 	sys-libs/zlib
