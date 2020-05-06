@@ -55,7 +55,7 @@ DEPEND_ALL="
 	x11-libs/pango
 	media-libs/fontconfig
 "
-if [[ ${JSPKG} == "yarm" ]]; then
+if [[ ${JSPKG} == "yarn" ]]; then
 	DEPEND="$DEPEND_ALL sys-apps/yarn"
 elif [[ ${JSPKG} == "npm" ]]; then
 	DEPEND="$DEPEND_ALL net-libs/nodejs[npm]"
