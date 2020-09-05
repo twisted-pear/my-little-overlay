@@ -42,7 +42,7 @@ inherit eutils desktop xdg-utils ${SCM}
 LICENSE="Apache-2.0 MIT BSD"
 SLOT="0"
 
-IUSE="+native-extensions"
+IUSE="libressl +native-extensions"
 REQUIRED_USE=""
 
 # get dependencies via:
@@ -57,7 +57,8 @@ RDEPEND="
 	dev-libs/glib
 	dev-libs/nspr
 	dev-libs/nss
-	dev-libs/openssl
+	!libressl? ( dev-libs/openssl )
+	libressl? ( dev-libs/libressl )
 	media-libs/alsa-lib
 	media-libs/fontconfig
 	media-libs/mesa
